@@ -1,7 +1,9 @@
 module Jorm
+using SQLite
 
 # Write your package code here.
 export RawSQL,@raw_sql,tablename
+export connect,disconnect,SQLiteConnectionString
 
 """
     struct RawSQL  
@@ -41,6 +43,35 @@ end
 
 
 # connection to db 
+
+Base.@kwdef struct SQLiteConnectionString
+    database_name::String
+end
+
+
+"""
+    connect(connection_string::String)
+        -> SQLite.DB
+
+Establish a connection to an SQLite database using the provided connection string.
+"""
+function connect(connection_string::SQLiteConnectionString)
+    db = SQLite.DB(connection_string.database_name)
+    return db
+end
+
+"""
+    disconnect(db::SQLite.DB)
+        -> Nothing
+
+Close the connection to the SQLite database.
+"""
+function disconnect(db::SQLite.DB)::Nothing
+    SQLite.close(db)
+    return nothing
+end
+
+
 
 # crud as sql 
 # crud 
