@@ -253,11 +253,13 @@ function filter_by_sql(table_name; kwargs...)
     
     # Iterate over keyword arguments to build the WHERE clause
     conditions = []
+    operator = get(kwargs, :operator, "AND")  # Default to AND if not specified
+    
     for (key, value) in kwargs
-        if key isa Symbol
+        if key == :operator
+            continue  # Skip the operator keyword
+        elseif key isa Symbol
             push!(conditions, "$key = '$value'")
-        elseif key isa Function
-            error("Functions are not supported for database queries")
         elseif key isa Expr && key.head == :call
             # Handle binary operations like :A > 3
             push!(conditions, string(key))
@@ -269,15 +271,13 @@ function filter_by_sql(table_name; kwargs...)
         end
     end
     
-    # Combine conditions with AND operator
+    # Combine conditions with the specified operator
     if !isempty(conditions)
-        where_clause = "WHERE " * join(conditions, " AND ")
+        where_clause = "WHERE " * join(conditions, " $operator ")
     end
     
     # Construct the SQL query
     query = "SELECT * FROM $table_name $where_clause"
-    
-    # Execute the query and return the result as a DataFrame
     return query
 end
 # crud 
