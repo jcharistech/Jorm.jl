@@ -161,3 +161,11 @@ end
 
 
 # end
+
+
+# Test setup
+@testset "filter_by Tests" begin
+    @test Jorm.filter_by_sql("my_table", A = 4, B = "d") == "SELECT * FROM my_table WHERE A = '4' AND B = 'd'"
+    @test Jorm.filter_by_sql("my_table", B = "d") == "SELECT * FROM my_table WHERE B = 'd'"
+
+end

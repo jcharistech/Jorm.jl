@@ -6,7 +6,7 @@ using DataFrames
 export RawSQL,@raw_sql,tablename
 export connect,disconnect,SQLiteConnectionString
 export create_table,delete_table
-export read_one_sql,insert_sql,update_sql,delete_sql
+export read_one_sql,insert_sql,update_sql,delete_sql,filter_by_sql
 export read_one,insert!,update!,delete!
 
 
@@ -245,6 +245,41 @@ function delete!(db::SQLite.DB, model, id)
     Jorm.execute_query(db, query, params)
 end
 # crud as sql 
+
+# Define the function to filter data from the database
+function filter_by_sql(table_name; kwargs...)
+    # Initialize the WHERE clause
+    where_clause = ""
+    
+    # Iterate over keyword arguments to build the WHERE clause
+    conditions = []
+    for (key, value) in kwargs
+        if key isa Symbol
+            push!(conditions, "$key = '$value'")
+        elseif key isa Function
+            error("Functions are not supported for database queries")
+        elseif key isa Expr && key.head == :call
+            # Handle binary operations like :A > 3
+            push!(conditions, string(key))
+        elseif key isa Expr && key.head == :comparison
+            # Handle comparisons like :A > 3
+            push!(conditions, string(key))
+        else
+            error("Unsupported condition type")
+        end
+    end
+    
+    # Combine conditions with AND operator
+    if !isempty(conditions)
+        where_clause = "WHERE " * join(conditions, " AND ")
+    end
+    
+    # Construct the SQL query
+    query = "SELECT * FROM $table_name $where_clause"
+    
+    # Execute the query and return the result as a DataFrame
+    return query
+end
 # crud 
 
 
