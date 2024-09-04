@@ -165,3 +165,17 @@ end
 
 end
 
+
+
+@testset "Group By SQL Constructs" begin
+        # Example usage:
+    table_name = "my_table"
+    group_by_columns = ["column1", "column2"]
+    select_columns = ["column1", "column2", "SUM(column3) AS total"]
+    having_conditions = Dict("SUM(column3)" => 100)
+    order_by_columns = ["column1", "column2"]
+
+    query, params = Jorm.groupby_sql(table_name; group_by_columns, select_columns, having_conditions, order_by_columns)
+    @test query == "SELECT [\"column1\", \"column2\", \"SUM(column3) AS total\"] FROM my_table GROUP BY column1, column2 HAVING SUM(column3) = ? ORDER BY column1, column2"
+    
+end

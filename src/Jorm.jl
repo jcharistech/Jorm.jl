@@ -7,7 +7,7 @@ using LibPQ
 export RawSQL,@raw_sql,tablename
 export connect,disconnect,SQLiteConnectionString
 export create_table,delete_table
-export read_one_sql,insert_sql,update_sql,delete_sql,filter_by_sql
+export read_one_sql,insert_sql,update_sql,delete_sql,filter_by_sql,groupby_sql
 export read_one,insert!,update!,delete!
 
 
@@ -340,6 +340,49 @@ function filter_by(db::SQLite.DB, model, table_name; kwargs...)
     result = Jorm.execute_query(db, query, params)
     return result
 end
+
+
+"""
+    groupby_sql(table_name; group_by_columns, select_columns = "*", having_conditions = nothing, order_by_columns = nothing) 
+    Returns the result of the given condition from the Database. This uses `SELECT`
+"""
+function groupby_sql(table_name; group_by_columns, select_columns = "*", having_conditions = nothing, order_by_columns = nothing)
+    # Initialize the SELECT clause
+    select_clause = select_columns
+
+    # Initialize the GROUP BY clause
+    group_by_clause = "GROUP BY " * join(group_by_columns, ", ")
+
+    # Initialize the HAVING clause if conditions are provided
+    having_clause = ""
+    having_params = []
+    if having_conditions !== nothing
+        having_conditions_str = []
+        for (column, value) in having_conditions
+            push!(having_conditions_str, "$column = ?")
+            push!(having_params, value)
+        end
+        having_clause = "HAVING " * join(having_conditions_str, " AND ")
+    end
+
+    # Initialize the ORDER BY clause if columns are provided
+    order_by_clause = ""
+    if order_by_columns !== nothing
+        order_by_clause = "ORDER BY " * join(order_by_columns, ", ")
+    end
+
+    # Construct the SQL query using SQLStrings.jl
+    query = "SELECT $select_clause FROM $table_name $group_by_clause"
+    if !isempty(having_clause)
+        query = "$query $having_clause"
+    end
+    if !isempty(order_by_clause)
+        query = "$query $order_by_clause"
+    end
+
+    return query, having_params
+end
+
 
 
 
