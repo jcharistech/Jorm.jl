@@ -1,6 +1,7 @@
 module Jorm
 using SQLite
 using DataFrames
+using LibPQ
 
 # Write your package code here.
 export RawSQL,@raw_sql,tablename
@@ -53,6 +54,14 @@ Base.@kwdef struct SQLiteConnectionString
     database_name::String
 end
 
+Base.@kwdef struct PostgreSQLConnectionString 
+    endpoint::String
+    username::String
+    password::String
+    port::Int
+    database_name::String
+end
+# use LibPQ.jl 
 
 """
     connect(connection_string::String)
@@ -63,6 +72,18 @@ Establish a connection to an SQLite database using the provided connection strin
 function connect(connection_string::SQLiteConnectionString)
     db = SQLite.DB(connection_string.database_name)
     return db
+end
+
+"""
+    connect(connection_string::String)
+        -> LibPQ.Connection
+
+Establish a connection to an SQLite database using the provided connection string.
+"""
+function connect(connection_string::PostgreSQLConnectionString)
+    LibPQ.Connection(
+        "host=" * connection_string.endpoint * " user=" * connection_string.username * " password=" * connection_string.password * " port=" * string(connection_string.port) * " dbname=" * connection_string.database_name
+    )
 end
 
 """
@@ -78,6 +99,17 @@ end
 
 
 """
+    disconnect(db::LibPQ.Connection)
+        -> Nothing
+
+Close the connection to the PostgreSQL database.
+"""
+function disconnect(db::LibPQ.Connection)::Nothing
+    LibPQ.close(db)
+    return nothing
+end
+
+"""
     execute_query(db::SQLite.DB, query::RawSQL, params::Vector{Any}=Any[]) 
     Returns the executed sql 
 """
@@ -86,6 +118,19 @@ function execute_query(db::SQLite.DB, query::RawSQL, params::Vector{Any}=Any[];t
         return SQLite.DBInterface.execute(db, query.value, params) |> DataFrame
     else
         return SQLite.DBInterface.execute(db, query.value, params) 
+    end
+end
+
+
+"""
+    execute_query(db::LibPQ.Connection, query::RawSQL, params::Vector{Any}=Any[]) 
+    Returns the executed sql 
+"""
+function execute_query(db::LibPQ.Connection, query::RawSQL, params::Vector{Any}=Any[];toDF::Bool=false)
+    if toDF
+        return LibPQ.execute(db, query.value, params) |> DataFrame
+    else
+        return LibPQ.execute(db, query.value, params) 
     end
 end
 
@@ -198,10 +243,10 @@ function show_sql(func, args...)
     end
 end
 
-# Define the function to filter data from the database
+ 
 """
     filter_by_sql(table_name; kwargs...)
-    Filter by condition 
+    Filter data by condition from the database
 """
 function filter_by_sql(table_name; kwargs...)
     # Initialize the WHERE clause
@@ -238,8 +283,8 @@ function filter_by_sql(table_name; kwargs...)
     query = "SELECT * FROM $table_name $where_clause"
     return query, params
 end
-# CRUD functions using the above SQL generation and execution
 
+# CRUD functions using the above SQL generation and execution
 """
     read_one(db::SQLite.DB, model, id) 
     Returns a given model object when given the ID  
@@ -284,7 +329,7 @@ function delete!(db::SQLite.DB, model, id)
     params = Any[id]
     Jorm.execute_query(db, query, params)
 end
-# crud as sql 
+
 
 """
     filter_by(db::SQLite.DB, model, table_name; kwargs...) 
@@ -296,8 +341,6 @@ function filter_by(db::SQLite.DB, model, table_name; kwargs...)
     return result
 end
 
-
-# crud 
 
 
 end
