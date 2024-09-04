@@ -198,6 +198,46 @@ function show_sql(func, args...)
     end
 end
 
+# Define the function to filter data from the database
+"""
+    filter_by_sql(table_name; kwargs...)
+    Filter by condition 
+"""
+function filter_by_sql(table_name; kwargs...)
+    # Initialize the WHERE clause
+    where_clause = ""
+    
+    # Iterate over keyword arguments to build the WHERE clause
+    conditions = []
+    operator = get(kwargs, :operator, "AND")  # Default to AND if not specified
+    params = []
+
+    for (key, value) in kwargs
+        if key == :operator
+            continue  # Skip the operator keyword
+        elseif key isa Symbol
+            push!(conditions, "$key = '$value'")
+            push!(params, value)
+        elseif key isa Expr && key.head == :call
+            # Handle binary operations like :A > 3
+            push!(conditions, string(key))
+        elseif key isa Expr && key.head == :comparison
+            # Handle comparisons like :A > 3
+            push!(conditions, string(key))
+        else
+            error("Unsupported condition type")
+        end
+    end
+    
+    # Combine conditions with the specified operator
+    if !isempty(conditions)
+        where_clause = "WHERE " * join(conditions, " $operator ")
+    end
+    
+    # Construct the SQL query
+    query = "SELECT * FROM $table_name $where_clause"
+    return query, params
+end
 # CRUD functions using the above SQL generation and execution
 
 """
@@ -246,40 +286,17 @@ function delete!(db::SQLite.DB, model, id)
 end
 # crud as sql 
 
-# Define the function to filter data from the database
-function filter_by_sql(table_name; kwargs...)
-    # Initialize the WHERE clause
-    where_clause = ""
-    
-    # Iterate over keyword arguments to build the WHERE clause
-    conditions = []
-    operator = get(kwargs, :operator, "AND")  # Default to AND if not specified
-    
-    for (key, value) in kwargs
-        if key == :operator
-            continue  # Skip the operator keyword
-        elseif key isa Symbol
-            push!(conditions, "$key = '$value'")
-        elseif key isa Expr && key.head == :call
-            # Handle binary operations like :A > 3
-            push!(conditions, string(key))
-        elseif key isa Expr && key.head == :comparison
-            # Handle comparisons like :A > 3
-            push!(conditions, string(key))
-        else
-            error("Unsupported condition type")
-        end
-    end
-    
-    # Combine conditions with the specified operator
-    if !isempty(conditions)
-        where_clause = "WHERE " * join(conditions, " $operator ")
-    end
-    
-    # Construct the SQL query
-    query = "SELECT * FROM $table_name $where_clause"
-    return query
+"""
+    filter_by(db::SQLite.DB, model, table_name; kwargs...) 
+    Returns the result of the given condition from the Database. This uses `SELECT`
+"""
+function filter_by(db::SQLite.DB, model, table_name; kwargs...)
+    query,params = filter_by_sql(table_name;kwargs)
+    result = Jorm.execute_query(db, query, params)
+    return result
 end
+
+
 # crud 
 
 

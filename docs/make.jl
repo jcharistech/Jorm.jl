@@ -9,7 +9,7 @@ makedocs(;
     sitename="Jorm.jl",
     format=Documenter.HTML(;
         canonical="https://jcharistech.github.io/Jorm.jl",
-        edit_link="master",
+        edit_link="main",
         assets=String[],
     ),
     pages=[
@@ -20,5 +20,5 @@ makedocs(;
 
 deploydocs(;
     repo="github.com/jcharistech/Jorm.jl",
-    devbranch="master",
+    devbranch="main",
 )

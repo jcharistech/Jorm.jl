@@ -19,7 +19,7 @@ end
 
 
 # Test that the connection is established successfully
-@testset "Connection Tests" begin
+@testset "Connections" begin
     # Test with a valid connection string
     connection_string = Jorm.SQLiteConnectionString(database_name="test.db")
     db = Jorm.connect(connection_string)
@@ -49,27 +49,21 @@ function teardown_test_db(db)
     rm("test.db")
 end
 
-@testset "Test Utils" begin
+@testset "Utils" begin
     @test Jorm.tablename(BlogPost) == "blog_post"
     @test @raw_sql("SELECT * FROM my_table") == Jorm.RawSQL("SELECT * FROM my_table")
 end
 
 
 # Test that the connection is established successfully
-@testset "Connection Tests" begin
-    # Test with a valid connection string
-    connection_string = Jorm.SQLiteConnectionString(database_name="test.db")
-    db = Jorm.connect(connection_string)
-    @test typeof(db) == SQLite.DB
-    Jorm.disconnect(db)
-
+@testset "Invalid Connection" begin
     # Test with an invalid connection string (this should throw an error)
-    # invalid_connection_string = "invalid_path"
-    # @test_throws SQLite.Error Jorm.connect(invalid_connection_string)
+    invalid_connection_string = "invalid_path"
+    @test_throws MethodError Jorm.connect(invalid_connection_string)
 end
 
 # Test that the query executes successfully and returns the correct result
-@testset "Execute Query Tests" begin
+@testset "Execute Query" begin
     db = setup_test_db()
     query = Jorm.RawSQL("SELECT * FROM test_table WHERE id = ?")
     params = Any["John"]
@@ -106,7 +100,7 @@ end
 end
 
 
-@testset "Test Show SQL Constructs" begin
+@testset "Show SQL Constructs" begin
     # Example usage:
     struct MyModel
         id::Int
@@ -164,9 +158,10 @@ end
 
 
 # Test setup
-@testset "filter_by Tests" begin
-    @test Jorm.filter_by_sql("my_table", A = 4, B = "d") == "SELECT * FROM my_table WHERE A = '4' AND B = 'd'"
-    @test Jorm.filter_by_sql("my_table", B = "d") == "SELECT * FROM my_table WHERE B = 'd'"
-    @test Jorm.filter_by_sql("my_table", A = 4, B = "d", operator = "OR") == "SELECT * FROM my_table WHERE A = '4' OR B = 'd'"
+@testset "Show Filter By SQL Constructs" begin
+    @test Jorm.filter_by_sql("my_table", A = 4, B = "d") == ("SELECT * FROM my_table WHERE A = '4' AND B = 'd'", Any[4, "d"])
+    @test Jorm.filter_by_sql("my_table", B = "d") == ("SELECT * FROM my_table WHERE B = 'd'", Any["d"])
+    @test Jorm.filter_by_sql("my_table", A = 4, B = "d", operator = "OR") == ("SELECT * FROM my_table WHERE A = '4' OR B = 'd'", Any[4, "d"])
 
 end
+
