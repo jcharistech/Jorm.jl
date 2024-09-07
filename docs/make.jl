@@ -5,7 +5,7 @@ DocMeta.setdocmeta!(Jorm, :DocTestSetup, :(using Jorm); recursive=true)
 
 makedocs(;
     modules=[Jorm],
-    authors="Jcharis <jcharistech@gmail.com> and contributors",
+    authors="Jesse E.Agbe (Jcharis) <jcharistech@gmail.com> and contributors",
     sitename="Jorm.jl",
     format=Documenter.HTML(;
         canonical="https://jcharistech.github.io/Jorm.jl",
@@ -14,7 +14,8 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
-        "API Reference" => "reference.md",
+        "Jorm.jl with WebApps" => "working_with_webapps.md",
+        "API Reference" => "apireference.md",
     ],
 )
 
