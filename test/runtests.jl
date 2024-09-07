@@ -111,57 +111,93 @@ end
 
     data = MyModel(1, "John Doe", 30)
 
-    @test read_one_sql(MyModel, 1) == "SELECT * FROM my_model WHERE id = ?"
-    @test insert_sql(MyModel, data) == "INSERT INTO my_model (id, name, age) VALUES (?, ?, ?)"
-    @test update_sql(MyModel, 1, data) == "UPDATE my_model SET id = ?, name = ?, age = ? WHERE id = ?"
-    @test delete_sql(MyModel, 1) == "DELETE FROM my_model WHERE id = ?"
+    @test read_one_sql(MyModel).value == "SELECT * FROM my_model WHERE id = ?"
+    @test insert_sql(MyModel).value == "INSERT INTO my_model (id, name, age) VALUES (?, ?, ?)"
+    @test update_sql(MyModel).value == "UPDATE my_model SET id = ?, name = ?, age = ? WHERE id = ?"
+    @test delete_sql(MyModel).value == "DELETE FROM my_model WHERE id = ?"
+    @test read_all_sql(MyModel).value == "SELECT * FROM my_model"
 
 end
 
-# @testset "CRUD Test" begin
-#     struct Blog
-#         id::Int
-#         name::String
-#     end
-#     connection_string = Jorm.SQLiteConnectionString(database_name="test.db")
-#     tb = Jorm.tablename(Blog)
-#     db = Jorm.connect(connection_string)
-#     Jorm.create_table(db,Blog,tb)
+
+# Test the create_table function
+@testset "Create Table" begin
+
+    struct Blog
+        title::String
+        content::String
+    end
+
+    connection_string = Jorm.SQLiteConnectionString(database_name="test.db")
+    tb = Jorm.tablename(Blog)
+    db = Jorm.connect(connection_string)
+
+    # Create the table
+    Jorm.create_table(db, Blog, tb)
+
+    # Check if the table exists
+    result = Jorm.list_tables(connection_string)
+    @test !isempty(result)
+
+    # Close the database connection
+    Jorm.disconnect(db)
+
+    # Remove the test database file
+    rm("test.db", force=true)
+end
+
+@testset "CRUD Test" begin
+    struct BlogArticle
+        title::String
+        content::String
+    end
+    connection_string = Jorm.SQLiteConnectionString(database_name="test.db")
+    tb = Jorm.tablename(BlogArticle)
+    db = Jorm.connect(connection_string)
+    Jorm.create_table(db,BlogArticle,tb)
     
-#     # Create a new record
-#     data = Blog(1, "My Blog Post")
-#     Jorm.insert!(db, Blog, data)
+    # Create a new record
+    data = BlogArticle("First Title","My Blog Post")
+    Jorm.insert!(db, BlogArticle, data)
 
-#     # Read all records
-#     results = Jorm.read_all(db, Blog)
-#     for row in results
-#         @test row.id == 1
-#     end
+    # Read all records
+    results = Jorm.read_all(db, BlogArticle)
+    for row in results
+        @test row.id == 1
+    end
 
-#     # Update an existing record
-#     updated_data = Blog(1, "Updated Blog Post")
-#     Jorm.update!(db, Blog, 1, updated_data)
+    # Update an existing record
+    updated_data = BlogArticle("First Title", "Updated Blog Post")
+    Jorm.update!(db, BlogArticle, 1, updated_data)
 
-#     # Read one record by ID
-#     result = Jorm.read_one(db, Blog, 1)
-#     println(result)
+    # Read one record by ID
+    result = Jorm.read_one(db, BlogArticle, 1)
+    println(result)
 
-#     for row in results
-#         @test row.id == 1
-#     end
-
-#     # Close the database connection
-#     Jorm.disconnect(db)
+    for row in results
+        @test row.id == 1
+        @test row.content == "Updated Blog Post"
+    end
 
 
-# end
+    # Read one record by ID
+    result = Jorm.delete!(db, BlogArticle, 1)
+    result = Jorm.read_one(db, BlogArticle, 1)
+    @test isempty(result)
+
+    # Close the database connection
+    Jorm.disconnect(db)
+    Jorm.delete_db(connection_string)
+
+
+end
 
 
 # Test setup
 @testset "Show Filter By SQL Constructs" begin
-    @test Jorm.filter_by_sql("my_table", A = 4, B = "d") == ("SELECT * FROM my_table WHERE A = '4' AND B = 'd'", Any[4, "d"])
-    @test Jorm.filter_by_sql("my_table", B = "d") == ("SELECT * FROM my_table WHERE B = 'd'", Any["d"])
-    @test Jorm.filter_by_sql("my_table", A = 4, B = "d", operator = "OR") == ("SELECT * FROM my_table WHERE A = '4' OR B = 'd'", Any[4, "d"])
+    @test Jorm.filter_by_sql("my_table", A = 4, B = "d") == (RawSQL("SELECT * FROM my_table WHERE A = '4' AND B = 'd'"), Any[4, "d"])
+    @test Jorm.filter_by_sql("my_table", B = "d") == (RawSQL("SELECT * FROM my_table WHERE B = 'd'"), Any["d"])
+    @test Jorm.filter_by_sql("my_table", A = 4, B = "d", operator = "OR") == (RawSQL("SELECT * FROM my_table WHERE A = '4' OR B = 'd'"), Any[4, "d"])
 
 end
 
