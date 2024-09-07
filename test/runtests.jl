@@ -2,6 +2,7 @@ using Jorm
 using Test
 using SQLite
 
+
 @testset "Raw SQL" begin
     # Write your tests here.
     @test @raw_sql("SELECT * FROM my_table;") == Jorm.RawSQL("SELECT * FROM my_table;")
@@ -68,7 +69,6 @@ end
     query = Jorm.RawSQL("SELECT * FROM test_table WHERE id = ?")
     params = Any["John"]
     result = Jorm.execute_query(db, query, params)
-    println(result)
     for row in result
         @test row.id == 1
         @test row.name == "John"
@@ -77,7 +77,7 @@ end
     query2 = Jorm.RawSQL("INSERT INTO test_table (id, name) VALUES (?, ?)")
     params2 = Any[2, "Peter"]
     result2 = Jorm.execute_query(db, query2, params2)
-    println(result2)
+
     for row in result2
         @test row.id == 2
         @test row.name == "Peter"
@@ -86,8 +86,7 @@ end
     params3 = Any[3, "Petro"]
    
     result2df = Jorm.execute_query(db, query3, params3,toDF=true)
-    # @test result2df.id == 3
-    # @test result2df.name == "Petro"
+    # @test typeof(result2df) == DataFrame
     teardown_test_db(db)
 end
 
@@ -172,7 +171,7 @@ end
 
     # Read one record by ID
     result = Jorm.read_one(db, BlogArticle, 1)
-    println(result)
+
 
     for row in results
         @test row.id == 1
