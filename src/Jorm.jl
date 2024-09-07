@@ -9,7 +9,7 @@ export connect,disconnect,SQLiteConnectionString
 export create_table,delete_table
 export read_one_sql,insert_sql,update_sql,delete_sql,filter_by_sql,groupby_sql,read_all_sql
 export read_one,insert!,update!,delete!,read_all
-export delete_db,drop_all_tables
+export delete_db,drop_all_tables,backup_sqlite_db,backup_postgresql_db
 
 
 """
@@ -287,6 +287,44 @@ function delete_all!(db::SQLite.DB, model)
     query = "DELETE FROM $(tablename(model))"
     DBInterface.execute(db, query)
 end
+
+
+"""
+    backup_sqlite_db(db::SQLite.DB, model) 
+    # usage
+    backup_sqlite_db("example.db", "example_backup.db")
+    
+"""
+function backup_sqlite_db(db_path::String, backup_path::String)
+    if isfile(db_path)
+        cp(db_path, backup_path)
+        println("SQLite database backed up successfully.")
+    else
+        println("SQLite database file not found.")
+    end
+end
+
+
+
+"""
+    backup_postgresql_db(db_name::String, host::String="localhost", user::String="postgres", password::String="", backup_file::String="backup.sql") 
+    # Usage
+    backup_postgresql_db("mydb", "localhost", "postgres", "mypassword", "backup.sql")
+    
+"""
+function backup_postgresql_db(db_name::String, host::String="localhost", user::String="postgres", password::String="", backup_file::String="backup.sql")
+    cmd = `pg_dump -h $host -U $user $db_name`
+    if !isempty(password)
+        cmd = `pg_dump -h $host -U $user -W $password $db_name`
+    end
+    output = read(cmd, String)
+    open(backup_file, "w") do io
+        write(io, output)
+    end
+    println("PostgreSQL database backed up successfully.")
+end
+
+
 
 
 
