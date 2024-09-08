@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Jorm.jl with WebApps · Jorm.jl</title><meta name="title" content="Jorm.jl with WebApps · Jorm.jl"/><meta property="og:title" content="Jorm.jl with WebApps · Jorm.jl"/><meta property="twitter:title" content="Jorm.jl with WebApps · Jorm.jl"/><meta name="description" content="Documentation for Jorm.jl."/><meta property="og:description" content="Documentation for Jorm.jl."/><meta property="twitter:description" content="Documentation for Jorm.jl."/><meta property="og:url" content="https://jcharistech.github.io/Jorm.jl/working_with_webapps/"/><meta property="twitter:url" content="https://jcharistech.github.io/Jorm.jl/working_with_webapps/"/><link rel="canonical" href="https://jcharistech.github.io/Jorm.jl/working_with_webapps/"/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">Jorm.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li class="is-active"><a class="tocitem" href>Jorm.jl with WebApps</a></li><li><a class="tocitem" href="../apireference/">API Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Jorm.jl with WebApps</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Jorm.jl with WebApps</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/jcharistech/Jorm.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/jcharistech/Jorm.jl/blob/main/docs/src/working_with_webapps.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h3 id="Using-Jorm.jl-with-Oxygen.jl-Web-Framework"><a class="docs-heading-anchor" href="#Using-Jorm.jl-with-Oxygen.jl-Web-Framework">Using Jorm.jl with Oxygen.jl Web Framework</a><a id="Using-Jorm.jl-with-Oxygen.jl-Web-Framework-1"></a><a class="docs-heading-anchor-permalink" href="#Using-Jorm.jl-with-Oxygen.jl-Web-Framework" title="Permalink"></a></h3><p>Oxygen.jl is a nice to use web framework in Julia. In this tutorial we will explore how to create a CRUD (Create, Read, Update, Delete) application using <code>Oxygen.jl</code> and <code>Jorm.jl</code>, you can follow these steps. </p><h3 id="Installation-and-Setup"><a class="docs-heading-anchor" href="#Installation-and-Setup">Installation and Setup</a><a id="Installation-and-Setup-1"></a><a class="docs-heading-anchor-permalink" href="#Installation-and-Setup" title="Permalink"></a></h3><p>First, ensure you have the necessary packages installed:</p><pre><code class="language-julia hljs">using Pkg
+Pkg.add(&quot;Oxygen&quot;)
+Pkg.add(&quot;Jorm&quot;)
+Pkg.add(&quot;SQLite&quot;)
+Pkg.add(&quot;HTTP&quot;)
+Pkg.add(&quot;StructTypes&quot;)</code></pre><h3 id="Basic-App-Structure"><a class="docs-heading-anchor" href="#Basic-App-Structure">Basic App Structure</a><a id="Basic-App-Structure-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-App-Structure" title="Permalink"></a></h3><p>We can setup a basic structure for our CRUD application using <code>Oxygen.jl</code> and <code>Jorm.jl</code>.</p><h4 id="Define-Your-Model"><a class="docs-heading-anchor" href="#Define-Your-Model">Define Your Model</a><a id="Define-Your-Model-1"></a><a class="docs-heading-anchor-permalink" href="#Define-Your-Model" title="Permalink"></a></h4><p>Define a struct to represent your data model:</p><pre><code class="language-julia hljs">struct BlogPost
+    title::String
+    content::String
+end
+
+# Support JSON serialization and deserialization
+StructTypes.StructType(::Type{BlogPost}) = StructTypes.Struct()</code></pre><h4 id="Connect-to-the-Database"><a class="docs-heading-anchor" href="#Connect-to-the-Database">Connect to the Database</a><a id="Connect-to-the-Database-1"></a><a class="docs-heading-anchor-permalink" href="#Connect-to-the-Database" title="Permalink"></a></h4><p>Use <code>Jorm.jl</code> to connect to the SQLite database and create the necessary table:</p><pre><code class="language-julia hljs">using Jorm
+
+connection_string = Jorm.SQLiteConnectionString(database_name=&quot;blog.db&quot;)
+db = Jorm.connect(connection_string)
+tb = Jorm.tablename(BlogPost)
+Jorm.create_table(db, BlogPost, tb)</code></pre><h4 id="CRUD-Endpoints-with-Oxygen.jl"><a class="docs-heading-anchor" href="#CRUD-Endpoints-with-Oxygen.jl">CRUD Endpoints with Oxygen.jl</a><a id="CRUD-Endpoints-with-Oxygen.jl-1"></a><a class="docs-heading-anchor-permalink" href="#CRUD-Endpoints-with-Oxygen.jl" title="Permalink"></a></h4><p>Define the CRUD endpoints using <code>Oxygen.jl</code>:</p><pre><code class="language-julia hljs">using Oxygen
+
+
+# Output Model
+struct BlogPostOutput
+    id::Int # to handle autoincrement ID field
+    title::String
+    content::String
+end
+
+# Create a new blog post
+@post &quot;/api/v1/blogs/&quot; function(req::HTTP.Request)
+    data = Oxygen.json(req, BlogPost)
+    Jorm.insert!(db, BlogPost, data)
+    return data
+end
+
+# Read all blog posts
+@get &quot;/api/v1/blogs/&quot; function(req::HTTP.Request)
+    results = Jorm.read_all(db, BlogPost)
+    return Jorm.serialize_to_list(BlogPostOutput,results)
+end
+
+# Read one blog post by ID
+@get &quot;/api/v1/blogs/{blog_id}&quot; function(req::HTTP.Request, blog_id::Int)
+    result = Jorm.read_one(db, BlogPost, blog_id)
+    return Jorm.serialize_to_list(BlogPostOutput,result)
+end
+
+# Update an existing blog post
+@patch &quot;/api/v1/blogs/{blog_id}&quot; function(req::HTTP.Request, blog_id::Int)
+    data = Oxygen.json(req, BlogPost)
+    Jorm.update!(db, BlogPost, blog_id, data)
+    return data
+end
+
+# Delete a blog post by ID
+@delete &quot;/api/v1/blogs/{blog_id}&quot; function(req::HTTP.Request, blog_id::Int)
+    result = Jorm.delete!(db, BlogPost, blog_id)
+    return result
+end
+
+# Start the server
+serve(port=8001)</code></pre><h4 id="View-in-Browser"><a class="docs-heading-anchor" href="#View-in-Browser">View in Browser</a><a id="View-in-Browser-1"></a><a class="docs-heading-anchor-permalink" href="#View-in-Browser" title="Permalink"></a></h4><p>Once you start the server ,you can check your browser or any web client to see the API endpoints available on <code>http://localhost:8001</code></p><p>This is one of the ways that provides a clear and concise guide on how to set up and use the CRUD API with <code>Oxygen.jl</code> and <code>Jorm.jl</code>.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../apireference/">API Reference »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.7.0 on <span class="colophon-date" title="Sunday 8 September 2024 01:03">Sunday 8 September 2024</span>. Using Julia version 1.10.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
