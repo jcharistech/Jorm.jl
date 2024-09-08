@@ -411,34 +411,9 @@ end
 # Function to perform bulk insert
 function bulk_insert!(db::SQLite.DB, model::Type, data::Vector)
     query, params = bulk_insert_sql(model, data)
-    
-    # Execute the query within a transaction for better performance
-    # Jorm.execute_query(db, RawSQL("BEGIN TRANSACTION;"))
     Jorm.execute_query(db, query, params)
-    # Jorm.execute_query(db, RawSQL("COMMIT;"))
 end
 
-
-# function bulk_update!(db::SQLite.DB, model::Type, data::Vector{model})
-#     # Start a transaction for better performance
-#     Jorm.execute_query(db, "BEGIN TRANSACTION;")
-
-#     for item in data
-#         # Generate the SQL query for updating a record
-#         columns = join([string(field, " = ?") for field in fieldnames(model)], ", ")
-#         query = "UPDATE $(tablename(model)) SET $columns WHERE id = ?"
-        
-#         # Prepare the parameters
-#         params = Any[getfield(item, field) for field in fieldnames(model)]
-#         push!(params, item.id)  # Add the id for the WHERE clause
-        
-#         # Execute the update query
-#         Jorm.execute_query(db, query, params)
-#     end
-
-#     # Commit the transaction
-#     Jorm.execute_query(db, "COMMIT;")
-# end
 
 include("JormUtils.jl")
 
