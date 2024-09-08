@@ -10,6 +10,7 @@ export create_table,delete_table
 export read_one_sql,insert_sql,update_sql,delete_sql,filter_by_sql,groupby_sql,read_all_sql
 export read_one,insert!,update!,delete!,read_all
 export delete_db,drop_all_tables,backup_sqlite_db,backup_postgresql_db,serialize_to_list
+export bulk_insert_sql,bulk_insert!
 
 
 """
@@ -375,6 +376,69 @@ function groupby_sql(table_name; group_by_columns, select_columns = "*", having_
     return query, having_params
 end
 
+"""
+    bulk_insert_sql(db::SQLite.DB, model::Type, data::Vector{model}) 
+    Generate SQL insert query for bulk insertion 
+"""
+# Function to perform bulk insert
+function bulk_insert_sql(model::Type, data::Vector)
+    num_rows = length(data)
+    num_fields = length(fieldnames(model))
+    params = Any[getfield(row, field) for row in data for field in fieldnames(model)]
+    
+    # Construct the SQL query
+    columns = join(fieldnames(model), ", ")
+    placeholders = join(repeat("?", length(fieldnames(model))), ", ")
+    
+    # Construct rows with placeholders
+    rows = []
+    for _ in 1:num_rows
+        push!(rows, "($placeholders)")
+    end
+    rows_str = join(rows, ", ")
+    
+    # Construct the final query
+    query = "INSERT INTO $(tablename(model)) ($columns) VALUES $rows_str"
+    
+    return RawSQL(query), params
+end
+
+
+"""
+    bulk_insert!(db::SQLite.DB, model::Type, data::Vector{model}) 
+    Insert or Add data to the DB for a given model in bulk 
+"""
+# Function to perform bulk insert
+function bulk_insert!(db::SQLite.DB, model::Type, data::Vector)
+    query, params = bulk_insert_sql(model, data)
+    
+    # Execute the query within a transaction for better performance
+    # Jorm.execute_query(db, RawSQL("BEGIN TRANSACTION;"))
+    Jorm.execute_query(db, query, params)
+    # Jorm.execute_query(db, RawSQL("COMMIT;"))
+end
+
+
+# function bulk_update!(db::SQLite.DB, model::Type, data::Vector{model})
+#     # Start a transaction for better performance
+#     Jorm.execute_query(db, "BEGIN TRANSACTION;")
+
+#     for item in data
+#         # Generate the SQL query for updating a record
+#         columns = join([string(field, " = ?") for field in fieldnames(model)], ", ")
+#         query = "UPDATE $(tablename(model)) SET $columns WHERE id = ?"
+        
+#         # Prepare the parameters
+#         params = Any[getfield(item, field) for field in fieldnames(model)]
+#         push!(params, item.id)  # Add the id for the WHERE clause
+        
+#         # Execute the update query
+#         Jorm.execute_query(db, query, params)
+#     end
+
+#     # Commit the transaction
+#     Jorm.execute_query(db, "COMMIT;")
+# end
 
 include("JormUtils.jl")
 

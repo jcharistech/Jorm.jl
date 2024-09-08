@@ -213,3 +213,36 @@ end
     @test query == "SELECT [\"column1\", \"column2\", \"SUM(column3) AS total\"] FROM my_table GROUP BY column1, column2 HAVING SUM(column3) = ? ORDER BY column1, column2"
     
 end
+
+
+
+@testset "Bulk Insert SQL Construct" begin
+    # Create some sample data
+    data = [ BlogArticle("First Title","My Blog Post"),  BlogArticle("Second Title","Second Blog Post"),  BlogArticle("Third Title","My Third Post")]
+    @test Jorm.bulk_insert_sql(BlogArticle,data) == (RawSQL("INSERT INTO blog_article (title, content) VALUES (?, ?), (?, ?), (?, ?)"), Any["First Title", "My Blog Post", "Second Title", "Second Blog Post", "Third Title", "My Third Post"])
+end
+
+
+@testset "Bulk Insert" begin
+
+    connection_string = Jorm.SQLiteConnectionString(database_name="test.db")
+    tb = Jorm.tablename(BlogArticle)
+    db = Jorm.connect(connection_string)
+    Jorm.create_table(db,BlogArticle,tb)
+    
+    data = [ BlogArticle("First Title","My Blog Post"),  BlogArticle("Second Title","Second Blog Post"),  BlogArticle("Third Title","My Third Post")]
+    Jorm.bulk_insert!(db,BlogArticle,data)
+
+    # Read all records
+    results = Jorm.read_all(db, BlogArticle)
+
+    @test length([i for i in results]) == 3
+    for (ix, row) in enumerate(results)
+        @test row.id == ix
+    end
+
+    # Close the database connection
+    Jorm.disconnect(db)
+    # Jorm.delete_db(connection_string)
+
+end
