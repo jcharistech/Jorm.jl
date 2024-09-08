@@ -4,7 +4,6 @@ using SQLite
 
 
 @testset "Raw SQL" begin
-    # Write your tests here.
     @test @raw_sql("SELECT * FROM my_table;") == Jorm.RawSQL("SELECT * FROM my_table;")
 end
 
