@@ -25,7 +25,6 @@ Define a struct to represent your data model:
 
 ```julia
 struct BlogPost
-    id::Int
     title::String
     content::String
 end
@@ -54,6 +53,14 @@ Define the CRUD endpoints using `Oxygen.jl`:
 ```julia
 using Oxygen
 
+
+# Output Model
+struct BlogPostOutput
+    id::Int # to handle autoincrement ID field
+    title::String
+    content::String
+end
+
 # Create a new blog post
 @post "/api/v1/blogs/" function(req::HTTP.Request)
     data = Oxygen.json(req, BlogPost)
@@ -64,13 +71,13 @@ end
 # Read all blog posts
 @get "/api/v1/blogs/" function(req::HTTP.Request)
     results = Jorm.read_all(db, BlogPost)
-    return results
+    return Jorm.serialize_to_list(BlogPostOutput,results)
 end
 
 # Read one blog post by ID
 @get "/api/v1/blogs/{blog_id}" function(req::HTTP.Request, blog_id::Int)
     result = Jorm.read_one(db, BlogPost, blog_id)
-    return result
+    return Jorm.serialize_to_list(BlogPostOutput,result)
 end
 
 # Update an existing blog post

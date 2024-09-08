@@ -9,7 +9,7 @@ export connect,disconnect,SQLiteConnectionString
 export create_table,delete_table
 export read_one_sql,insert_sql,update_sql,delete_sql,filter_by_sql,groupby_sql,read_all_sql
 export read_one,insert!,update!,delete!,read_all
-export delete_db,drop_all_tables,backup_sqlite_db,backup_postgresql_db
+export delete_db,drop_all_tables,backup_sqlite_db,backup_postgresql_db,serialize_to_list
 
 
 """

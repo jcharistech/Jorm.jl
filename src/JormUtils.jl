@@ -138,4 +138,20 @@ function backup_postgresql_db(db_name::String, host::String="localhost", user::S
 end
 
 
+"""
+    serialize_to_list(outputmodel::Type,query)
+    Convert an SQL Query result into serialized list
+    outputmodel:: Same Model but with id::Int defined to handle auto generated ID 
+    from autoincrement 
 
+"""
+function serialize_to_list(outputmodel::Type,query)
+    if !isempty(query)
+        # Create a list of structs
+        struct_list = [outputmodel(row...) for row in query]
+        return struct_list
+    else
+        return nothing
+    end
+
+end
