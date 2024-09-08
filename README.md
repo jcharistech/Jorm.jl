@@ -14,8 +14,8 @@
 ### Overview
 
 `Jorm.jl` is a simple Julia package designed to simplify interactions between Julia code and databases. It provides a straightforward Object-Relational Mapping (ORM) layer, allowing you to work with databases using Julia structs and functions.
-The current database support include SQLite. 
-+ Future supporting database will include PostGreSQL, MySQL and more.
+The current database support includes SQLite. 
++ Future  plan is to offer support for databases such as PostGreSQL, MySQL and more.
 
 ### Installation
 
@@ -94,49 +94,53 @@ Jorm.delete_db(connection_string)
 Here is a complete example demonstrating the usage of `Jorm.jl`:
 
 ```julia
-@testset "CRUD Test" begin
-    struct BlogArticle
-        title::String
-        content::String
-    end
 
-    connection_string = Jorm.SQLiteConnectionString(database_name="test.db")
-    tb = Jorm.tablename(BlogArticle)
-    db = Jorm.connect(connection_string)
-    Jorm.create_table(db, BlogArticle, tb)
-
-    # Create a new record
-    data = BlogArticle("First Title", "My Blog Post")
-    Jorm.insert!(db, BlogArticle, data)
-
-    # Read all records
-    results = Jorm.read_all(db, BlogArticle)
-    for row in results
-        @test row.id == 1
-    end
-
-    # Update an existing record
-    updated_data = BlogArticle("First Title", "Updated Blog Post")
-    Jorm.update!(db, BlogArticle, 1, updated_data)
-
-    # Read one record by ID
-    result = Jorm.read_one(db, BlogArticle, 1)
-    println(result)
-
-    for row in results
-        @test row.id == 1
-        @test row.content == "Updated Blog Post"
-    end
-
-    # Delete a record
-    result = Jorm.delete!(db, BlogArticle, 1)
-    result = Jorm.read_one(db, BlogArticle, 1)
-    @test isempty(result)
-
-    # Close the database connection
-    Jorm.disconnect(db)
-    Jorm.delete_db(connection_string)
+struct BlogArticle
+     title::String
+    content::String
 end
+
+connection_string = Jorm.SQLiteConnectionString(database_name="test.db")
+tb = Jorm.tablename(BlogArticle)
+db = Jorm.connect(connection_string)
+Jorm.create_table(db, BlogArticle, tb)
+
+# Create a new record
+data = BlogArticle("First Title", "My Blog Post")
+Jorm.insert!(db, BlogArticle, data)
+
+# Read all records
+results = Jorm.read_all(db, BlogArticle)
+for row in results
+    @test row.id == 1
+end
+
+# Serialize the data
+Jorm.serialize_to_list(results)
+
+# Update an existing record
+updated_data = BlogArticle("First Title", "Updated Blog Post")
+Jorm.update!(db, BlogArticle, 1, updated_data)
+
+# Read one record by ID
+result = Jorm.read_one(db, BlogArticle, 1)
+println(result)
+
+
+for row in results
+    println(row.id)
+    println(row.content)
+end
+
+# Delete a record
+result = Jorm.delete!(db, BlogArticle, 1)
+result = Jorm.read_one(db, BlogArticle, 1)
+@test isempty(result)
+
+# Close the database connection
+Jorm.disconnect(db)
+Jorm.delete_db(connection_string)
+
 ```
 
 ### API Documentation

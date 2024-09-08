@@ -11,7 +11,9 @@ CurrentModule = Jorm
 The current database support include SQLite. 
 + Future supporting database will include PostGreSQL, MySQL and more.
 
-You can use Jorm.jl as an ORM Layer with Oxygen.jl Framework to handle your database operations. The name `Jorm.jl` is a combination of `Julia` + `ORM`.
+You can use Jorm.jl as an ORM Layer with Oxygen.jl Web Framework to handle your database operations. This was part of the initial driving goals for designing Jorm.jl.
+
+**The name `Jorm.jl` is a combination of `Julia` + `ORM`.**
 
 ### Installation
 
