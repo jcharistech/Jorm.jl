@@ -2,6 +2,7 @@ module Jorm
 using SQLite
 using DataFrames
 using LibPQ
+using Dates
 
 # export fxns
 export RawSQL,@raw_sql,tablename,getmodel_data
