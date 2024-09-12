@@ -240,7 +240,14 @@ end
     for (ix, row) in enumerate(results)
         @test row.id == ix
     end
+    struct BlogArticleOut
+        id::Int
+        title::String
+        content::String
+    end
 
+    new_sql = Jorm.execute_query(db,@raw_sql"SELECT * FROM blog_article")
+    @test Jorm.serialize_to_list(BlogArticleOut,new_sql) == BlogArticleOut[BlogArticleOut(1, "First Title", "My Blog Post"), BlogArticleOut(2, "Second Title", "Second Blog Post"), BlogArticleOut(3, "Third Title", "My Third Post")]
     # Close the database connection
     Jorm.disconnect(db)
     # Jorm.delete_db(connection_string)

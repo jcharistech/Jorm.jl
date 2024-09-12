@@ -139,16 +139,16 @@ end
 
 
 """
-    serialize_to_list(outputmodel::Type,query)
+    serialize_to_list(outputmodel::Type,queryresult)
     Convert an SQL Query result into serialized list
     outputmodel:: Same Model but with id::Int defined to handle auto generated ID 
     from autoincrement 
 
 """
-function serialize_to_list(outputmodel::Type,query)
-    if !isempty(query)
+function serialize_to_list(outputmodel::Type,queryresult)
+    if !isempty(queryresult)
         # Create a list of structs
-        struct_list = [outputmodel(row...) for row in query]
+        struct_list = [outputmodel(row...) for row in queryresult]
         return struct_list
     else
         return nothing
