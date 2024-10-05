@@ -8,8 +8,8 @@ using Dates
 export RawSQL,@raw_sql,tablename,getmodel_data
 export connect,disconnect,SQLiteConnectionString
 export create_table,delete_table
-export read_one_sql,insert_sql,update_sql,delete_sql,filter_by_sql,groupby_sql,read_all_sql
-export read_one,insert!,update!,delete!,read_all
+export read_one_sql,insert_sql,update_sql,delete_sql,filter_by_sql,groupby_sql,read_all_sql,getfirst_sql
+export read_one,insert!,update!,delete!,read_all,getfirst 
 export delete_db,drop_all_tables,backup_sqlite_db,backup_postgresql_db,serialize_to_list
 export bulk_insert_sql,bulk_insert!
 
@@ -210,6 +210,11 @@ function delete_sql(model)
     return RawSQL(query)
 end
 
+function getfirst_sql(model,column)
+    query = "SELECT * FROM $(tablename(model)) WHERE $column = ?"
+    return RawSQL(query)
+end
+
 # Wrapper function to display the SQL syntax
 function show_sql(func, args...)
     if func == insert!
@@ -222,6 +227,8 @@ function show_sql(func, args...)
         return read_one_sql(args)
     elseif func == read_all
         return read_all_sql(args)
+    elseif func == getfirst
+        return getfirst_sql(args,..)
     else
         error("Unsupported function")
     end
@@ -415,6 +422,17 @@ function bulk_insert!(db::SQLite.DB, model::Type, data::Vector)
     Jorm.execute_query(db, query, params)
 end
 
+
+"""
+    getfirst(db::SQLite.DB, model, column,value) 
+    Returns a given model object when given the column and the search value  
+"""
+function getfirst(db::SQLite.DB, model, column::String,value)
+    query = getfirst_sql(model,column)
+    params = Any[value]
+    result = Jorm.execute_query(db, query, params)
+    return result
+end
 
 include("JormUtils.jl")
 

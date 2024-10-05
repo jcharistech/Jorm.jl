@@ -114,6 +114,7 @@ end
     @test update_sql(MyModel).value == "UPDATE my_model SET id = ?, name = ?, age = ? WHERE id = ?"
     @test delete_sql(MyModel).value == "DELETE FROM my_model WHERE id = ?"
     @test read_all_sql(MyModel).value == "SELECT * FROM my_model"
+    @test getfirst_sql(MyModel,"name").value == "SELECT * FROM my_model WHERE name = ?"
 
 end
 
@@ -177,6 +178,14 @@ end
         @test row.content == "Updated Blog Post"
     end
 
+    # Read one record by column 
+    result2 = Jorm.getfirst(db, BlogArticle,"title", "First Title")
+
+    for row in result2
+        @test row.id == 1
+        @test row.title == "First Title" 
+    end
+    
 
     # Read one record by ID
     result = Jorm.delete!(db, BlogArticle, 1)
