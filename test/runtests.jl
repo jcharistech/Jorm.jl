@@ -114,6 +114,7 @@ end
     @test update_sql(MyModel).value == "UPDATE my_model SET id = ?, name = ?, age = ? WHERE id = ?"
     @test delete_sql(MyModel).value == "DELETE FROM my_model WHERE id = ?"
     @test read_all_sql(MyModel).value == "SELECT * FROM my_model"
+    @test getfirst_sql(MyModel,"name").value == "SELECT * FROM my_model WHERE name = ?"
 
 end
 
@@ -177,6 +178,14 @@ end
         @test row.content == "Updated Blog Post"
     end
 
+    # Read one record by column 
+    result2 = Jorm.getfirst(db, BlogArticle,"title", "First Title")
+
+    for row in result2
+        @test row.id == 1
+        @test row.title == "First Title" 
+    end
+    
 
     # Read one record by ID
     result = Jorm.delete!(db, BlogArticle, 1)
@@ -240,7 +249,14 @@ end
     for (ix, row) in enumerate(results)
         @test row.id == ix
     end
+    struct BlogArticleOut
+        id::Int
+        title::String
+        content::String
+    end
 
+    new_sql = Jorm.execute_query(db,@raw_sql"SELECT * FROM blog_article")
+    @test Jorm.serialize_to_list(BlogArticleOut,new_sql) == BlogArticleOut[BlogArticleOut(1, "First Title", "My Blog Post"), BlogArticleOut(2, "Second Title", "Second Blog Post"), BlogArticleOut(3, "Third Title", "My Third Post")]
     # Close the database connection
     Jorm.disconnect(db)
     # Jorm.delete_db(connection_string)
