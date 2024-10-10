@@ -126,6 +126,12 @@ Jorm.update!(db, BlogArticle, 1, updated_data)
 result = Jorm.read_one(db, BlogArticle, 1)
 println(result)
 
+# Read one record by key
+result = Jorm.getfirst(db, BlogArticle,"title", "First Title")
+println(result)
+
+
+
 
 for row in results
     println(row.id)
