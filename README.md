@@ -131,8 +131,6 @@ result = Jorm.getfirst(db, BlogArticle,"title", "First Title")
 println(result)
 
 
-
-
 for row in results
     println(row.id)
     println(row.content)

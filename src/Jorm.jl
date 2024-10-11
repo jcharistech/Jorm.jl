@@ -425,7 +425,7 @@ end
 
 """
     getfirst(db::SQLite.DB, model, column,value) 
-    Returns a given model object when given the column and the search value  
+    Returns a given model object when given the column and the value to search for   
 """
 function getfirst(db::SQLite.DB, model, column::String,value)
     query = getfirst_sql(model,column)
