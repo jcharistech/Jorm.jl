@@ -155,7 +155,8 @@ For detailed API documentation, please refer to the [Jorm.jl API Documentation](
 
 ### Contributing
 
-Contributions are welcome Please open an issue or pull request on the [Jorm.jl GitHub repository](https://github.com/jcharistech/Jorm.jl).
+Contributions are welcome. 
+Please open an issue or pull request on the [Jorm.jl GitHub repository](https://github.com/jcharistech/Jorm.jl).
 
 ### License
 
